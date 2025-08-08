@@ -25,12 +25,13 @@ pipeline {
       }
     }
 
-    stage('Build Docker Image') {
-      steps {
-        // build from project root; Dockerfile expects target/account-service.jar
-        sh "docker build -t ${IMAGE} ."
-      }
+   stage('Build Docker Image') {
+  steps {
+    dir('account-service') {
+      sh "docker build -t ${IMAGE} ."
     }
+  }
+}
 
     stage('Push to Docker Hub') {
       steps {
