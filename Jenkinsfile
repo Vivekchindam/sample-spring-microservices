@@ -50,7 +50,7 @@ pipeline {
         sshagent (credentials: [env.SSH_CRED]) {
           // copy optional deploy script and run, or run commands inline
           sh '''
-            ssh -o StrictHostKeyChecking=no user@your-server-ip 'bash -s' <<'ENDSSH'
+            ssh -o StrictHostKeyChecking=no ec2-user@16.171.165.231 'bash -s' <<'ENDSSH'
               set -e
               echo "Stopping existing container if present..."
               docker stop ${APP_NAME} || true
