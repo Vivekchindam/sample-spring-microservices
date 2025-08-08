@@ -2,9 +2,8 @@ pipeline {
   agent any
 
   environment {
-    // Create these credentials in Jenkins and use the IDs below
-    DOCKERHUB_CRED = 'dockerhub-creds'     // Username/password (or token)
-    SSH_CRED = 'server-ssh-key'             // SSH private key credentials id
+    DOCKERHUB_CRED = 'dockerhub-creds'     // Jenkins credential ID for Docker Hub
+    SSH_CRED = 'server-ssh-key'            // Jenkins credential ID for SSH
     IMAGE = 'vivekchindam21/sample'
     APP_NAME = 'account-service'
     APP_PORT = '8080'
@@ -25,13 +24,13 @@ pipeline {
       }
     }
 
-   stage('Build Docker Image') {
-  steps {
-    dir('account-service') {
-      sh "docker build -t ${IMAGE} ."
+    stage('Build Docker Image') {
+      steps {
+        dir('account-service') { // Go inside where Dockerfile exists
+          sh "docker build -t ${IMAGE} ."
+        }
+      }
     }
-  }
-}
 
     stage('Push to Docker Hub') {
       steps {
@@ -47,11 +46,9 @@ pipeline {
 
     stage('Deploy to Server') {
       steps {
-        // Uses Jenkins SSH Agent plugin; SSH_CRED must be an "SSH Username with private key" credential
         sshagent (credentials: [env.SSH_CRED]) {
-          // copy optional deploy script and run, or run commands inline
           sh '''
-            ssh -o StrictHostKeyChecking=no ec2-user@16.171.165.231 'bash -s' <<'ENDSSH'
+            ssh -o StrictHostKeyChecking=no ec2-user@16.171.165.231'bash -s' <<'ENDSSH'
               set -e
               echo "Stopping existing container if present..."
               docker stop ${APP_NAME} || true
